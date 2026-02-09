@@ -2,7 +2,6 @@ import { useReactConfStore } from "@/store/reactConfStore";
 import { getCurrentTimezone } from "@/utils/formatDate";
 import * as Device from "expo-device";
 import {
-  Button,
   ContextMenu,
   Host,
   HStack,
