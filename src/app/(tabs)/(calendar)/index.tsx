@@ -164,13 +164,6 @@ export default function Schedule() {
           selectedView={calendarView}
           onSelectView={handleViewChange}
         />
-        {calendarView === CalendarView.Day && (
-          <DateStrip
-            selectedDate={parseISO(selectedDate)}
-            onSelectDate={handleSelectDate}
-            eventsPerDay={eventsPerDay}
-          />
-        )}
         {calendarView === CalendarView.Month && (
           <MonthCalendar
             selectedDate={parseISO(selectedDate)}
@@ -235,14 +228,7 @@ export default function Schedule() {
       {calendarView === CalendarView.Day ? (
         <DaySchedule
           initialDate={parseISO(selectedDate)}
-          ListHeaderComponent={
-            <View style={{ backgroundColor: isLiquidGlass ? "transparent" : backgroundColor }}>
-              <CalendarViewPicker
-                selectedView={calendarView}
-                onSelectView={handleViewChange}
-              />
-            </View>
-          }
+          ListHeaderComponent={renderStickyHeader}
         />
       ) : (
         <AnimatedFlatList
