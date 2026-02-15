@@ -17,11 +17,11 @@ export default function Layout() {
       <Stack.Screen
         name="index"
         options={{
-          title: "Bookmarks",
+          title: "Stipend",
           headerTitle: () =>
             Platform.OS === "android" ? (
               <ThemedText fontSize={theme.fontSize20} fontWeight="bold">
-                Bookmarks
+                Stipend
               </ThemedText>
             ) : undefined,
 

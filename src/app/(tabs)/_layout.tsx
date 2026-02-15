@@ -1,6 +1,5 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import {
-  Badge,
   Icon,
   Label,
   NativeTabs,
@@ -17,14 +16,11 @@ import {
 } from "react-native";
 
 import { theme } from "@/theme";
-import { useBookmarkStore } from "@/store/bookmarkStore";
 import { isLiquidGlassAvailable } from "expo-glass-effect";
 import { useThemeColor } from "@/components/Themed";
 
 // Web-specific tab layout using standard Tabs component
 function WebTabLayout() {
-  const bookmarks = useBookmarkStore((state) => state.bookmarks);
-  const hasBookmarks = bookmarks.length > 0;
   const tintColor = useThemeColor(theme.color.reactBlue);
   const inactiveTintColor = useThemeColor({
     light: "#00000090",
@@ -60,11 +56,10 @@ function WebTabLayout() {
       <Tabs.Screen
         name="bookmarks"
         options={{
-          title: "Bookmarked",
+          title: "Stipend",
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="bookmark" size={size} color={color} />
+            <MaterialCommunityIcons name="wallet-outline" size={size} color={color} />
           ),
-          tabBarBadge: hasBookmarks ? bookmarks.length : undefined,
         }}
       />
       <Tabs.Screen
@@ -108,8 +103,6 @@ type VectorIconFamily = {
 
 // Native tab layout using NativeTabs component (iOS/Android only)
 function NativeTabLayout() {
-  const bookmarks = useBookmarkStore((state) => state.bookmarks);
-  const hasBookmarks = bookmarks.length > 0;
   const tintColor = useThemeColor(theme.color.reactBlue);
   const inactiveTintColor = useThemeColor({
     light: "#00000090",
@@ -167,23 +160,20 @@ function NativeTabLayout() {
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="bookmarks">
         {Platform.select({
-          ios: <Icon sf="bookmark" selectedColor={tintColor} />,
+          ios: <Icon sf="creditcard" selectedColor={tintColor} />,
           android: (
             <Icon
               src={
                 <VectorIcon
                   family={MaterialCommunityIcons as VectorIconFamily}
-                  name="bookmark"
+                  name="wallet-outline"
                 />
               }
               selectedColor={tintColor}
             />
           ),
         })}
-        <Label selectedStyle={labelSelectedStyle}>Bookmarked</Label>
-        {hasBookmarks && !isLiquidGlassAvailable() && (
-          <Badge>{bookmarks.length.toString()}</Badge>
-        )}
+        <Label selectedStyle={labelSelectedStyle}>Stipend</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger
         name="speakers"

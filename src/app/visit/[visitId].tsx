@@ -218,7 +218,7 @@ export default function VisitDetail() {
         }
       >
         {isLiquidGlassAvailable() && osName !== "iPadOS" && source ? (
-          <View style={{ height: drawerHeight }}>
+          <View style={[styles.absolute, { height: drawerHeight }]}>
             <Animated.View style={[opacityStyle, styles.absolute]}>
               <Canvas
                 style={{

@@ -22,6 +22,9 @@ export function VisitCard({ visit, onPress }: Props) {
     ? visitStatusColors[visit.status].dark 
     : visitStatusColors[visit.status].light;
 
+  // Nice light background that stands out from app background
+  const cardBackgroundColor = { light: "#FFFFFF", dark: "#1C1C1E" };
+
   const gestureTap = useMemo(
     () =>
       Gesture.Tap()
@@ -46,7 +49,7 @@ export function VisitCard({ visit, onPress }: Props) {
         <ThemedView style={styles.container}>
           {/* Main card */}
           <ThemedView
-            color={theme.color.backgroundSecondary}
+            color={cardBackgroundColor}
             style={styles.card}
           >
             {/* Status indicator bar */}
