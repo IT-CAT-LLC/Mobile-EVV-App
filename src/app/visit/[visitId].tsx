@@ -239,17 +239,13 @@ export default function VisitDetail() {
           style={styles.container}
           contentInsetAdjustmentBehavior="automatic"
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={[
-            styles.contentContainer,
-            {
-              flexGrow: 1,
-              paddingBottom: insets.bottom + theme.space24,
-              paddingTop: Platform.select({
-                ios: theme.space24,
-                default: undefined,
-              }),
-            },
-          ]}
+          contentContainerStyle={{
+            paddingBottom: insets.bottom + theme.space24,
+            paddingTop: Platform.select({
+              ios: theme.space16,
+              default: theme.space16,
+            }),
+          }}
         >
           {/* Header with care recipient info */}
           <View style={styles.header} collapsable={false}>
@@ -485,14 +481,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.space24,
     paddingTop: theme.space16,
   },
-  contentContainer: {
-    borderBottomLeftRadius: theme.borderRadius20,
-    borderBottomRightRadius: theme.borderRadius20,
-  },
   header: {
     alignItems: "center",
     gap: theme.space16,
-    marginTop: Platform.select({ ios: 0, android: 30 }),
     paddingHorizontal: theme.space24,
   },
   quickActionButton: {
