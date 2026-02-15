@@ -60,7 +60,7 @@ export default function VisitDetail() {
   const setVisits = useVisitStore((state) => state.setVisits);
   const updateVisit = useVisitStore((state) => state.updateVisit);
   const { width, height } = useWindowDimensions();
-  const drawerHeight = height * 0.85;
+  const drawerHeight = height;
   const highlightColor = useThemeColor(theme.color.reactBlue);
   const isDarkMode = useColorScheme() === "dark";
 
@@ -242,7 +242,7 @@ export default function VisitDetail() {
           contentContainerStyle={[
             styles.contentContainer,
             {
-              minHeight: drawerHeight,
+              flexGrow: 1,
               paddingBottom: insets.bottom + theme.space24,
               paddingTop: Platform.select({
                 ios: theme.space24,
