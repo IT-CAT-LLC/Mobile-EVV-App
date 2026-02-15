@@ -1,7 +1,7 @@
 import { useScrollToTop } from "@react-navigation/native";
-import { Stack, useFocusEffect } from "expo-router";
+import { useFocusEffect } from "expo-router";
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import { Platform, RefreshControl, View } from "react-native";
+import { Platform, RefreshControl } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import Animated, {
   useAnimatedScrollHandler,
@@ -19,7 +19,6 @@ import { CalendarView, ConferenceDay } from "@/consts";
 import { useReactConfStore } from "@/store/reactConfStore";
 import { useCalendarStore } from "@/store/calendarStore";
 import { CalendarViewPicker } from "@/components/CalendarViewPicker";
-import { DateStrip } from "@/components/DateStrip";
 import { MonthCalendar } from "@/components/MonthCalendar";
 import { DaySchedule } from "@/components/DaySchedule";
 import { useThemeColor } from "@/components/Themed";
@@ -27,10 +26,6 @@ import { theme } from "@/theme";
 import { Session } from "@/types";
 import { isLiquidGlassAvailable } from "expo-glass-effect";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import {
-  CurrentlyLive,
-  type CurrentlyLiveSession,
-} from "@/components/CurrentlyLive";
 
 const AnimatedFlatList = Animated.FlatList;
 
@@ -84,7 +79,7 @@ export default function Schedule() {
     [dayOne, dayTwo],
   );
 
-  // Calculate events per day for DateStrip and MonthCalendar
+  // Calculate events per day for MonthCalendar
   const eventsPerDay = useMemo(() => {
     const counts: Record<string, number> = {};
     allSessions.forEach((session) => {
@@ -191,47 +186,14 @@ export default function Schedule() {
     setIsRefreshing(false);
   };
 
-  const handleScrollToSession = (currentlyLive: CurrentlyLiveSession) => {
-    // Get the date of the session from the day
-    const sessionsForDay = currentlyLive.day === ConferenceDay.One ? dayOne : dayTwo;
-    if (sessionsForDay.length > 0 && sessionsForDay[0].startsAt) {
-      const dateStr = format(parseISO(sessionsForDay[0].startsAt), "yyyy-MM-dd");
-      setSelectedDate(dateStr);
-    }
-    setTimeout(() => {
-      scrollRef.current?.scrollToIndex({
-        index: currentlyLive.sessionIndex,
-        animated: true,
-        viewOffset: Platform.select({
-          android: 50,
-          default: isLiquidGlass
-            ? isScrolledDown.value
-              ? 155
-              : 87
-            : isScrolledDown.value
-              ? 125
-              : 120,
-        }),
-      });
-    }, 200);
-  };
-
   return (
     <>
-      <Stack.Screen
-        options={{
-          headerTitle: () => (
-            <CurrentlyLive scrollToSession={handleScrollToSession} />
-          ),
-        }}
-      />
-      <View style={{ flex: 1, display: calendarView === CalendarView.Day ? 'flex' : 'none' }}>
+      {calendarView === CalendarView.Day ? (
         <DaySchedule
           initialDate={parseISO(selectedDate)}
           ListHeaderComponent={renderStickyHeader}
         />
-      </View>
-      <View style={{ flex: 1, display: calendarView === CalendarView.Month ? 'flex' : 'none' }}>
+      ) : (
         <AnimatedFlatList
           ref={scrollRef}
           refreshControl={
@@ -256,7 +218,7 @@ export default function Schedule() {
           keyExtractor={(item: Session) => item.id}
           renderItem={renderItem}
         />
-      </View>
+      )}
     </>
   );
 }

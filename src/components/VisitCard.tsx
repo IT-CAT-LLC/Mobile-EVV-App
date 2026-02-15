@@ -1,7 +1,6 @@
-import { StyleSheet, View, useColorScheme } from "react-native";
+import { StyleSheet, View, useColorScheme, Pressable } from "react-native";
 import { useRouter } from "expo-router";
-import { useMemo } from "react";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { useCallback } from "react";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { format, parseISO } from "date-fns";
 import * as Haptics from "expo-haptics";
@@ -25,17 +24,10 @@ export function VisitCard({ visit, onPress }: Props) {
   // Nice light background that stands out from app background
   const cardBackgroundColor = { light: "#FFFFFF", dark: "#1C1C1E" };
 
-  const gestureTap = useMemo(
-    () =>
-      Gesture.Tap()
-        .maxDistance(10)
-        .runOnJS(true)
-        .onEnd(() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-          onPress?.(visit);
-        }),
-    [onPress, visit]
-  );
+  const handlePress = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    onPress?.(visit);
+  }, [onPress, visit]);
 
   const startTime = format(parseISO(visit.scheduledStartTime), "h:mm a");
   const endTime = format(parseISO(visit.scheduledEndTime), "h:mm a");
@@ -45,7 +37,7 @@ export function VisitCard({ visit, onPress }: Props) {
 
   return (
     <Animated.View entering={FadeIn} exiting={FadeOut}>
-      <GestureDetector gesture={gestureTap}>
+      <Pressable onPress={handlePress}>
         <ThemedView style={styles.container}>
           {/* Main card */}
           <ThemedView
@@ -142,7 +134,7 @@ export function VisitCard({ visit, onPress }: Props) {
             </View>
           </ThemedView>
         </ThemedView>
-      </GestureDetector>
+      </Pressable>
     </Animated.View>
   );
 }
