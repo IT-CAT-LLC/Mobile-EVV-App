@@ -21,6 +21,7 @@ import { useCalendarStore } from "@/store/calendarStore";
 import { CalendarViewPicker } from "@/components/CalendarViewPicker";
 import { DateStrip } from "@/components/DateStrip";
 import { MonthCalendar } from "@/components/MonthCalendar";
+import { DaySchedule } from "@/components/DaySchedule";
 import { useThemeColor } from "@/components/Themed";
 import { theme } from "@/theme";
 import { Session } from "@/types";
@@ -231,30 +232,42 @@ export default function Schedule() {
           ),
         }}
       />
-      <AnimatedFlatList
-        ref={scrollRef}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={handleRefreshSchedule}
-          />
-        }
-        style={{ backgroundColor }}
-        contentContainerStyle={{
-          paddingBottom: Platform.select({
-            android: 100 + insets.bottom,
-            default: 0,
-          }),
-        }}
-        contentInsetAdjustmentBehavior="automatic"
-        scrollToOverflowEnabled
-        onScroll={scrollHandler}
-        data={data}
-        ListHeaderComponent={renderStickyHeader}
-        stickyHeaderIndices={[0]}
-        keyExtractor={(item: Session) => item.id}
-        renderItem={renderItem}
-      />
+      {calendarView === CalendarView.Day ? (
+        <View style={{ flex: 1, backgroundColor }}>
+          <Animated.View style={stickyHeaderStyle}>
+            <CalendarViewPicker
+              selectedView={calendarView}
+              onSelectView={handleViewChange}
+            />
+          </Animated.View>
+          <DaySchedule initialDate={parseISO(selectedDate)} />
+        </View>
+      ) : (
+        <AnimatedFlatList
+          ref={scrollRef}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefreshSchedule}
+            />
+          }
+          style={{ backgroundColor }}
+          contentContainerStyle={{
+            paddingBottom: Platform.select({
+              android: 100 + insets.bottom,
+              default: 0,
+            }),
+          }}
+          contentInsetAdjustmentBehavior="automatic"
+          scrollToOverflowEnabled
+          onScroll={scrollHandler}
+          data={data}
+          ListHeaderComponent={renderStickyHeader}
+          stickyHeaderIndices={[0]}
+          keyExtractor={(item: Session) => item.id}
+          renderItem={renderItem}
+        />
+      )}
     </>
   );
 }

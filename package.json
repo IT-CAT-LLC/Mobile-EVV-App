@@ -23,6 +23,7 @@
     "@react-native-masked-view/masked-view": "0.3.2",
     "@react-navigation/core": "^7.0.0",
     "@react-navigation/elements": "^2.0.0",
+    "@shopify/flash-list": "^2.2.2",
     "@shopify/react-native-skia": "2.2.12",
     "@zoontek/react-native-navigation-bar": "^1.0.1",
     "babel-plugin-react-compiler": "^19.0.0-beta-a7bf2bd-20241110",

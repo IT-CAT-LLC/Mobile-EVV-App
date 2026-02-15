@@ -175,6 +175,39 @@ export default function Layout() {
                 }),
               }}
             />
+            <Stack.Screen
+              name="visit/[visitId]"
+              options={{
+                headerTransparent: Platform.OS === "ios" ? true : false,
+                headerLargeTitle: false,
+                title: "Visit Details",
+                presentation:
+                  Platform.OS === "ios"
+                    ? isLiquidGlassAvailable() && osName !== "iPadOS"
+                      ? "formSheet"
+                      : "modal"
+                    : "modal",
+                sheetGrabberVisible: true,
+                sheetAllowedDetents: [0.85],
+                sheetInitialDetentIndex: 0,
+                contentStyle: {
+                  backgroundColor: isLiquidGlassAvailable()
+                    ? "transparent"
+                    : tabBarBackgroundColor,
+                },
+                headerStyle: {
+                  backgroundColor:
+                    Platform.OS === "ios"
+                      ? "transparent"
+                      : tabBarBackgroundColor,
+                },
+                headerBlurEffect: isLiquidGlassAvailable()
+                  ? undefined
+                  : colorScheme === "dark"
+                    ? "dark"
+                    : "light",
+              }}
+            />
           </Stack>
         </ThemeProvider>
       </ActionSheetProvider>
