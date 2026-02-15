@@ -21,6 +21,7 @@ export function VisitCard({ visit, onPress }: Props) {
   const statusColor = isDarkMode 
     ? visitStatusColors[visit.status].dark 
     : visitStatusColors[visit.status].light;
+  const neutralLineColor = isDarkMode ? "#4A4A4A" : "#D1D5DB";
 
   const gestureTap = useMemo(
     () =>
@@ -53,7 +54,7 @@ export function VisitCard({ visit, onPress }: Props) {
             >
               {startTime}
             </ThemedText>
-            <View style={[styles.timeLine, { backgroundColor: statusColor }]} />
+            <View style={[styles.timeLine, { backgroundColor: neutralLineColor }]} />
             <ThemedText
               fontSize={theme.fontSize12}
               fontWeight="medium"

@@ -26,6 +26,8 @@ import { scheduleOnRN } from "react-native-worklets";
 import { osName } from "expo-device";
 import { useVisitStore, visitStatusLabels, visitStatusColors, Visit, VisitTask } from "@/store/visitStore";
 import { Button } from "@/components/Button";
+import { generateMockVisits } from "@/data/mockVisits";
+import { subDays, addDays } from "date-fns";
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
@@ -55,6 +57,7 @@ export default function VisitDetail() {
   const params = useLocalSearchParams();
   const visitId = params.visitId as string | undefined;
   const visits = useVisitStore((state) => state.visits);
+  const setVisits = useVisitStore((state) => state.setVisits);
   const updateVisit = useVisitStore((state) => state.updateVisit);
   const { width, height } = useWindowDimensions();
   const drawerHeight = height * 0.85;
@@ -62,17 +65,22 @@ export default function VisitDetail() {
   const isDarkMode = useColorScheme() === "dark";
 
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+
+  // Initialize visits if store is empty (happens on direct navigation)
+  React.useEffect(() => {
+    if (visits.length === 0) {
+      const today = new Date();
+      const mockData = generateMockVisits(subDays(today, 30), addDays(today, 60));
+      setVisits(mockData);
+    }
+  }, [visits.length, setVisits]);
 
   const triggerHaptic = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
   const overscrollAmount = useSharedValue(0);
-
-  const visit = visits.find((v) => v.id === visitId);
-
-  const insets = useSafeAreaInsets();
-
   const sheetAnim = useSharedValue(0);
   const hasTriggeredHaptic = useSharedValue(false);
 
@@ -115,6 +123,8 @@ export default function VisitDetail() {
   const opacityStyle = useAnimatedStyle(() => ({
     opacity: sheetAnim.value * 0.4,
   }));
+
+  const visit = visits.find((v) => v.id === visitId);
 
   const statusColor = visit
     ? isDarkMode
@@ -166,6 +176,15 @@ export default function VisitDetail() {
       updateVisit(visit.id, { tasks: updatedTasks });
     }
   };
+
+  // Show loading/placeholder if visits not loaded yet
+  if (visits.length === 0) {
+    return (
+      <ThemedView style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
+        <ThemedText fontSize={theme.fontSize16}>Loading...</ThemedText>
+      </ThemedView>
+    );
+  }
 
   if (!visit) {
     return <NotFound message="Visit not found" />;
