@@ -21,6 +21,7 @@ import { theme } from "../theme";
 
 import { ThemedText, useThemeColor } from "@/components/Themed";
 import { useReactConfStore } from "@/store/reactConfStore";
+import { useLastNotificationResponse } from "@/hooks/useLastNotificationResponse";
 import { osName } from "expo-device";
 
 SplashScreen.setOptions({
@@ -28,15 +29,17 @@ SplashScreen.setOptions({
   fade: true,
 });
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+if (Platform.OS !== "web") {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
+}
 
 export default function Layout() {
   const router = useRouter();
@@ -64,7 +67,8 @@ export default function Layout() {
     );
   }, [colorScheme]);
 
-  const lastNotificationResponse = Notifications.useLastNotificationResponse();
+  // useLastNotificationResponse is not available on web
+  const lastNotificationResponse = useLastNotificationResponse();
   useEffect(() => {
     if (
       lastNotificationResponse &&

@@ -34,7 +34,7 @@ import { osName } from "expo-device";
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
-const source = Skia.RuntimeEffect.Make(`
+const source = Platform.OS !== "web" ? Skia.RuntimeEffect.Make(`
 uniform float sheetAnim;
 uniform vec2 size;
 
@@ -54,7 +54,7 @@ vec4 main(vec2 pos) {
 
   vec4 color = mix(colorA, colorB, mixVal);
   return vec4(color);
-}`)!;
+}`) : null;
 
 const findTalk = (
   talkId: string | string[] | undefined,
