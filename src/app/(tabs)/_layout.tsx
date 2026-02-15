@@ -6,6 +6,7 @@ import {
   NativeTabs,
   VectorIcon,
 } from "expo-router/unstable-native-tabs";
+import { Tabs } from "expo-router";
 import React from "react";
 import {
   ColorValue,
@@ -20,6 +21,82 @@ import { useBookmarkStore } from "@/store/bookmarkStore";
 import { isLiquidGlassAvailable } from "expo-glass-effect";
 import { useThemeColor } from "@/components/Themed";
 
+// Web-specific tab layout using standard Tabs component
+function WebTabLayout() {
+  const bookmarks = useBookmarkStore((state) => state.bookmarks);
+  const hasBookmarks = bookmarks.length > 0;
+  const tintColor = useThemeColor(theme.color.reactBlue);
+  const inactiveTintColor = useThemeColor({
+    light: "#00000090",
+    dark: "#FFFFFF90",
+  });
+  const backgroundColor = useThemeColor(theme.color.background);
+
+  return (
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: tintColor,
+        tabBarInactiveTintColor: inactiveTintColor,
+        tabBarStyle: {
+          backgroundColor,
+          borderTopColor: inactiveTintColor + "30",
+        },
+        headerShown: false,
+      }}
+    >
+      <Tabs.Screen
+        name="(calendar)"
+        options={{
+          title: "Calendar",
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="calendar-blank"
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="bookmarks"
+        options={{
+          title: "Bookmarked",
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="bookmark" size={size} color={color} />
+          ),
+          tabBarBadge: hasBookmarks ? bookmarks.length : undefined,
+        }}
+      />
+      <Tabs.Screen
+        name="speakers"
+        options={{
+          title: "Speakers",
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="account-multiple"
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="info"
+        options={{
+          title: "Info",
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="map-outline"
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+    </Tabs>
+  );
+}
+
 // Todo (betomoedano): In the future we can remove this type. Learn more: https://exponent-internal.slack.com/archives/C0447EFTS74/p1758042759724779?thread_ts=1758039375.241799&cid=C0447EFTS74
 type VectorIconFamily = {
   getImageSource: (
@@ -29,7 +106,8 @@ type VectorIconFamily = {
   ) => Promise<ImageSourcePropType>;
 };
 
-export default function TabLayout() {
+// Native tab layout using NativeTabs component (iOS/Android only)
+function NativeTabLayout() {
   const bookmarks = useBookmarkStore((state) => state.bookmarks);
   const hasBookmarks = bookmarks.length > 0;
   const tintColor = useThemeColor(theme.color.reactBlue);
@@ -146,4 +224,12 @@ export default function TabLayout() {
       </NativeTabs.Trigger>
     </NativeTabs>
   );
+}
+
+// Export the appropriate layout based on platform
+export default function TabLayout() {
+  if (Platform.OS === "web") {
+    return <WebTabLayout />;
+  }
+  return <NativeTabLayout />;
 }
