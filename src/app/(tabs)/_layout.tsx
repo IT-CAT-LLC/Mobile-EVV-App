@@ -78,10 +78,10 @@ function WebTabLayout() {
       <Tabs.Screen
         name="info"
         options={{
-          title: "Info",
+          title: "Inbox",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
-              name="map-outline"
+              name="bell-outline"
               size={size}
               color={color}
             />
@@ -197,20 +197,20 @@ function NativeTabLayout() {
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="info">
         {Platform.select({
-          ios: <Icon sf="map" selectedColor={tintColor} />,
+          ios: <Icon sf="bell" selectedColor={tintColor} />,
           android: (
             <Icon
               src={
                 <VectorIcon
                   family={MaterialCommunityIcons as VectorIconFamily}
-                  name="map-outline"
+                  name="bell-outline"
                 />
               }
               selectedColor={tintColor}
             />
           ),
         })}
-        <Label selectedStyle={labelSelectedStyle}>Info</Label>
+        <Label selectedStyle={labelSelectedStyle}>Inbox</Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );

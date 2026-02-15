@@ -17,11 +17,11 @@ export default function Layout() {
       <Stack.Screen
         name="index"
         options={{
-          title: "Info",
+          title: "Inbox",
           headerTitle: () =>
             Platform.OS === "android" ? (
               <ThemedText fontSize={theme.fontSize20} fontWeight="bold">
-                Info
+                Inbox
               </ThemedText>
             ) : undefined,
 
