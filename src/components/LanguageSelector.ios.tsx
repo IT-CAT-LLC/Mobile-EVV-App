@@ -1,65 +1,90 @@
-import { StyleSheet } from "react-native";
-import { useActionSheet } from "@expo/react-native-action-sheet";
-
-import { ThemedPressable, ThemedText } from "./Themed";
+import { StyleSheet, useColorScheme } from "react-native";
+import {
+  ContextMenu,
+  Host,
+  HStack,
+  Image,
+  Picker,
+  Text,
+} from "@expo/ui/swift-ui";
+import { buttonStyle, frame } from "@expo/ui/swift-ui/modifiers";
+import { isLiquidGlassAvailable } from "expo-glass-effect";
+import * as Device from "expo-device";
 
 import {
   useLanguageStore,
   languageLabels,
   languageOptions,
-  Language,
 } from "@/store/languageStore";
 import { theme } from "@/theme";
 import * as Haptics from "expo-haptics";
 
+const isIpad = Device.osName === "iPadOS";
+const options = languageOptions.map((lang) => languageLabels[lang]);
+
 export function LanguageSelector() {
   const language = useLanguageStore((state) => state.language);
   const setLanguage = useLanguageStore((state) => state.setLanguage);
-  const { showActionSheetWithOptions } = useActionSheet();
+  const isDarkMode = useColorScheme() === "dark";
 
-  const handlePress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+  const selectedIndex = languageOptions.indexOf(language);
 
-    const options = [...languageOptions.map((lang) => languageLabels[lang]), "Cancel"];
-    const cancelButtonIndex = options.length - 1;
-
-    showActionSheetWithOptions(
-      {
-        options,
-        cancelButtonIndex,
-        title: "Select Language",
-      },
-      (selectedIndex) => {
-        if (selectedIndex !== undefined && selectedIndex !== cancelButtonIndex) {
-          const selectedLang = languageOptions[selectedIndex];
-          if (selectedLang !== language) {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            setLanguage(selectedLang);
-          }
-        }
-      },
-    );
+  const handleSelect = (newIndex: number) => {
+    if (selectedIndex !== newIndex) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      setLanguage(languageOptions[newIndex]);
+    }
   };
 
   return (
-    <ThemedPressable
-      style={styles.container}
-      onPress={handlePress}
-      backgroundColor={theme.color.backgroundSecondary}
-    >
-      <ThemedText fontSize={theme.fontSize12} fontWeight="semiBold">
-        {languageLabels[language].slice(0, 3).toUpperCase()}
-      </ThemedText>
-    </ThemedPressable>
+    <Host style={styles.container}>
+      <ContextMenu
+        modifiers={[
+          buttonStyle(isLiquidGlassAvailable() ? "glass" : "bordered"),
+        ]}
+      >
+        <ContextMenu.Items>
+          <Picker
+            selectedIndex={selectedIndex}
+            options={options}
+            onOptionSelected={({ nativeEvent: { index } }) =>
+              handleSelect(index)
+            }
+          />
+        </ContextMenu.Items>
+        <ContextMenu.Trigger>
+          <HStack
+            modifiers={[frame({ width: isIpad ? 70 : 60 })]}
+            spacing={theme.space4}
+          >
+            <Text
+              weight="semibold"
+              size={theme.fontSize10}
+              color={
+                isLiquidGlassAvailable()
+                  ? "primary"
+                  : isDarkMode
+                    ? "white"
+                    : "black"
+              }
+            >
+              {languageLabels[language].slice(0, 3).toUpperCase()}
+            </Text>
+            <Image
+              systemName="chevron.down"
+              size={theme.fontSize10}
+              color={isLiquidGlassAvailable() ? "primary" : "gray"}
+            />
+          </HStack>
+        </ContextMenu.Trigger>
+      </ContextMenu>
+    </Host>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    alignSelf: "flex-end",
-    borderRadius: theme.borderRadius40,
-    height: 32,
-    justifyContent: "center",
-    paddingHorizontal: theme.space16,
+    height: 34,
+    width: 94,
   },
 });
