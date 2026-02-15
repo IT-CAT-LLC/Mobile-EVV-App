@@ -70,10 +70,10 @@ function WebTabLayout() {
       <Tabs.Screen
         name="speakers"
         options={{
-          title: "Speakers",
+          title: "Care Team",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
-              name="account-multiple"
+              name="account-group"
               size={size}
               color={color}
             />
@@ -190,20 +190,20 @@ function NativeTabLayout() {
         role={isLiquidGlassAvailable() ? "search" : undefined}
       >
         {Platform.select({
-          ios: <Icon sf="person.2" />,
+          ios: <Icon sf="person.3" />,
           android: (
             <Icon
               src={
                 <VectorIcon
                   family={MaterialCommunityIcons as VectorIconFamily}
-                  name="account-multiple"
+                  name="account-group"
                 />
               }
               selectedColor={tintColor}
             />
           ),
         })}
-        <Label selectedStyle={labelSelectedStyle}>Speakers</Label>
+        <Label selectedStyle={labelSelectedStyle}>Care Team</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="info">
         {Platform.select({

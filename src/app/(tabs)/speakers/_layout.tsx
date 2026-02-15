@@ -23,11 +23,11 @@ export default function Layout() {
               : tabBarBackgroundColor,
           },
           headerLargeTitle: true,
-          title: "Speakers",
+          title: "Care Team",
           headerTitle: () =>
             Platform.OS === "android" ? (
               <ThemedText fontSize={theme.fontSize20} fontWeight="bold">
-                Speakers
+                Care Team
               </ThemedText>
             ) : undefined,
 
@@ -36,7 +36,7 @@ export default function Layout() {
             tintColor: tabBarTintColor,
             textColor: tabBarTintColor,
             hintTextColor: tabBarTintColor,
-            placeholder: "Search speakers",
+            placeholder: "Search care team",
             onChangeText: (event) => {
               router.setParams({
                 q: event.nativeEvent.text,

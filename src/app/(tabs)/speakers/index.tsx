@@ -1,110 +1,133 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import {
   Keyboard,
   Platform,
-  Pressable,
+  SectionList,
   StyleSheet,
   useWindowDimensions,
+  View,
 } from "react-native";
 
-import { NotFound } from "@/components/NotFound";
-
 import { ThemedText, ThemedView, useThemeColor } from "@/components/Themed";
-import { useReactConfStore } from "@/store/reactConfStore";
+import { CareTeamCard } from "@/components/CareTeamCard";
+import {
+  useCareTeamStore,
+  CareTeamMember,
+  CareTeamRole,
+  careTeamRoleLabels,
+  careTeamRoleColors,
+} from "@/store/careTeamStore";
 import { theme } from "@/theme";
-import { Link, useLocalSearchParams } from "expo-router";
-import { SpeakerDetails } from "@/components/SpeakerDetails";
-import { useBookmark } from "@/hooks/useBookmark";
-import { Speaker } from "@/types";
+import { useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
   FadeIn,
   FadeOut,
-  LinearTransition,
 } from "react-native-reanimated";
+import * as Haptics from "expo-haptics";
 
-export default function Speakers() {
-  const speakers = useReactConfStore((state) => state.allSessions.speakers);
-  const { width, height } = useWindowDimensions();
+type SectionData = {
+  title: string;
+  role: CareTeamRole;
+  data: CareTeamMember[];
+};
+
+const ROLE_ORDER: CareTeamRole[] = ["care_recipient", "caregiver", "nurse", "case_manager"];
+
+export default function CareTeam() {
+  const careTeam = useCareTeamStore((state) => state.careTeam);
+  const { height } = useWindowDimensions();
   const { bottom, top } = useSafeAreaInsets();
-  const { toggleBookmarkById, isBookmarked, getSessionById } = useBookmark();
   const backgroundColor = useThemeColor(theme.color.background);
+  const isDarkMode = backgroundColor === theme.color.background.dark;
 
   const params = useLocalSearchParams<{ q?: string }>();
-
   const searchText = params?.q?.toLowerCase() || "";
 
-  const filteredSpeakers = speakers.filter((speaker) => {
-    if (!searchText) {
-      return true;
-    }
-    return speaker.fullName.toLowerCase().includes(searchText);
-  });
+  // Filter and group by role
+  const sections = useMemo(() => {
+    const filtered = careTeam.filter((member) => {
+      if (!searchText) return true;
+      return (
+        member.fullName.toLowerCase().includes(searchText) ||
+        careTeamRoleLabels[member.role].toLowerCase().includes(searchText)
+      );
+    });
+
+    const grouped: SectionData[] = ROLE_ORDER
+      .map((role) => ({
+        title: careTeamRoleLabels[role],
+        role,
+        data: filtered.filter((m) => m.role === role),
+      }))
+      .filter((section) => section.data.length > 0);
+
+    return grouped;
+  }, [careTeam, searchText]);
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
 
+  const handleMemberPress = useCallback((member: CareTeamMember) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    // Could navigate to member detail page in the future
+  }, []);
+
   const renderItem = useCallback(
-    ({ item }: { item: Speaker }) => {
-      return (
-        <Animated.View key={item.id} entering={FadeIn} exiting={FadeOut}>
-          <Link
-            push
-            key={item.id}
-            href={{
-              pathname: "/speaker/[speaker]",
-              params: { speaker: item.id },
-            }}
-            asChild
-          >
-            <Link.Trigger>
-              <Pressable
-                onLongPress={() => {
-                  // adding this to prevent navigating on long press instead of opening the preview
-                }}
-                style={styles.speakerContainer}
-              >
-                <SpeakerDetails speaker={item} key={item.id} />
-              </Pressable>
-            </Link.Trigger>
-            <Link.Preview style={{ ...styles.preview, width: width }} />
-            <Link.Menu title={`Talks by ${item.fullName}`}>
-              {item.sessions
-                .map((sessionId) => {
-                  const sessionIdStr = sessionId.toString();
-                  const session = getSessionById(sessionIdStr);
-                  const bookmarked = isBookmarked(sessionIdStr);
-
-                  if (!session) return null;
-
-                  return (
-                    <Link.MenuAction
-                      key={sessionIdStr}
-                      title={session.title}
-                      icon={bookmarked ? "bookmark.fill" : "bookmark"}
-                      isOn={bookmarked}
-                      onPress={() => toggleBookmarkById(sessionIdStr)}
-                    />
-                  );
-                })
-                .filter(
-                  (item): item is NonNullable<typeof item> => item !== null,
-                )}
-            </Link.Menu>
-          </Link>
-        </Animated.View>
-      );
+    ({ item }: { item: CareTeamMember }) => {
+      return <CareTeamCard member={item} onPress={handleMemberPress} />;
     },
-    [width, getSessionById, isBookmarked, toggleBookmarkById],
+    [handleMemberPress]
   );
 
-  if (!speakers.length) {
-    return <NotFound message="Speakers unavailable" />;
+  const renderSectionHeader = useCallback(
+    ({ section }: { section: SectionData }) => {
+      const roleColor = isDarkMode
+        ? careTeamRoleColors[section.role].dark
+        : careTeamRoleColors[section.role].light;
+
+      return (
+        <View style={styles.sectionHeader}>
+          <View style={[styles.sectionIndicator, { backgroundColor: roleColor }]} />
+          <ThemedText
+            fontSize={theme.fontSize16}
+            fontWeight="bold"
+            color={{ light: roleColor, dark: roleColor }}
+          >
+            {section.title}
+          </ThemedText>
+          <ThemedText
+            fontSize={theme.fontSize14}
+            fontWeight="medium"
+            color={theme.color.textSecondary}
+          >
+            {section.data.length}
+          </ThemedText>
+        </View>
+      );
+    },
+    [isDarkMode]
+  );
+
+  if (!careTeam.length) {
+    return (
+      <ThemedView style={styles.emptyContainer}>
+        <ThemedText fontWeight="bold" fontSize={theme.fontSize20}>
+          No care team members
+        </ThemedText>
+        <ThemedText
+          fontSize={theme.fontSize16}
+          color={theme.color.textSecondary}
+        >
+          Your care team will appear here
+        </ThemedText>
+      </ThemedView>
+    );
   }
 
   return (
-    <Animated.FlatList
+    <SectionList
       scrollToOverflowEnabled
       contentInsetAdjustmentBehavior="automatic"
       onScrollBeginDrag={dismissKeyboard}
@@ -117,14 +140,11 @@ export default function Speakers() {
         },
         { minHeight: height - (bottom + top + 130) },
       ]}
-      ItemSeparatorComponent={() => (
-        <ThemedView style={styles.separator} color={theme.color.border} />
-      )}
-      extraData={isBookmarked || searchText}
+      sections={sections}
       renderItem={renderItem}
-      data={filteredSpeakers}
+      renderSectionHeader={renderSectionHeader}
       keyExtractor={(item) => item.id}
-      itemLayoutAnimation={LinearTransition}
+      stickySectionHeadersEnabled={false}
       ListEmptyComponent={
         <Animated.View entering={FadeIn} exiting={FadeOut}>
           <ThemedView style={styles.noResultsContainer}>
@@ -139,20 +159,31 @@ export default function Speakers() {
   );
 }
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   contentContainer: {
-    paddingHorizontal: theme.space16,
+    paddingTop: theme.space16,
+  },
+  emptyContainer: {
+    alignItems: "center",
+    flex: 1,
+    gap: theme.space8,
+    justifyContent: "center",
+    paddingHorizontal: theme.space24,
   },
   noResultsContainer: {
     padding: theme.space24,
   },
-  preview: {
-    height: 420,
+  sectionHeader: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: theme.space8,
+    marginBottom: theme.space12,
+    marginTop: theme.space8,
+    paddingHorizontal: theme.space16,
   },
-  separator: {
-    height: 1,
-  },
-  speakerContainer: {
-    paddingVertical: theme.space16,
+  sectionIndicator: {
+    borderRadius: 3,
+    height: 18,
+    width: 6,
   },
 });
