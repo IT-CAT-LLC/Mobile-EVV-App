@@ -193,6 +193,7 @@ export function DaySchedule({ initialDate = new Date(), ListHeaderComponent }: P
       onEndReached={handleEndReached}
       onEndReachedThreshold={0.5}
       onScrollToIndexFailed={onScrollToIndexFailed}
+      style={{ backgroundColor }}
       contentContainerStyle={styles.listContent}
       contentInsetAdjustmentBehavior="automatic"
       showsVerticalScrollIndicator={false}
@@ -297,7 +298,6 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 100,
-    paddingTop: theme.space8,
   },
   visitCountBadge: {
     backgroundColor: "rgba(8, 126, 164, 0.1)",

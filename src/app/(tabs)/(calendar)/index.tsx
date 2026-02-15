@@ -236,7 +236,7 @@ export default function Schedule() {
         <DaySchedule
           initialDate={parseISO(selectedDate)}
           ListHeaderComponent={
-            <View style={{ backgroundColor }}>
+            <View style={{ backgroundColor: isLiquidGlass ? "transparent" : backgroundColor }}>
               <CalendarViewPicker
                 selectedView={calendarView}
                 onSelectView={handleViewChange}
