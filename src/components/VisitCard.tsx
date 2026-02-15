@@ -21,7 +21,6 @@ export function VisitCard({ visit, onPress }: Props) {
   const statusColor = isDarkMode 
     ? visitStatusColors[visit.status].dark 
     : visitStatusColors[visit.status].light;
-  const neutralLineColor = isDarkMode ? "#4A4A4A" : "#D1D5DB";
 
   const gestureTap = useMemo(
     () =>
@@ -45,25 +44,6 @@ export function VisitCard({ visit, onPress }: Props) {
     <Animated.View entering={FadeIn} exiting={FadeOut}>
       <GestureDetector gesture={gestureTap}>
         <ThemedView style={styles.container}>
-          {/* Time indicator */}
-          <View style={styles.timeColumn}>
-            <ThemedText
-              fontSize={theme.fontSize14}
-              fontWeight="semiBold"
-              color={theme.color.textSecondary}
-            >
-              {startTime}
-            </ThemedText>
-            <View style={[styles.timeLine, { backgroundColor: neutralLineColor }]} />
-            <ThemedText
-              fontSize={theme.fontSize12}
-              fontWeight="medium"
-              color={theme.color.textSecondary}
-            >
-              {format(parseISO(visit.scheduledEndTime), "h:mm")}
-            </ThemedText>
-          </View>
-
           {/* Main card */}
           <ThemedView
             color={theme.color.backgroundSecondary}
@@ -166,21 +146,8 @@ export function VisitCard({ visit, onPress }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "row",
     marginHorizontal: theme.space16,
     marginBottom: theme.space16,
-  },
-  timeColumn: {
-    alignItems: "center",
-    marginRight: theme.space12,
-    paddingTop: theme.space4,
-    width: 50,
-  },
-  timeLine: {
-    borderRadius: 2,
-    flex: 1,
-    marginVertical: theme.space4,
-    width: 4,
   },
   card: {
     borderRadius: theme.borderRadius12,

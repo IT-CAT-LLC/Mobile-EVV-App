@@ -236,12 +236,12 @@ export default function Schedule() {
         <DaySchedule
           initialDate={parseISO(selectedDate)}
           ListHeaderComponent={
-            <Animated.View style={[stickyHeaderStyle, { backgroundColor }]}>
+            <View style={{ backgroundColor }}>
               <CalendarViewPicker
                 selectedView={calendarView}
                 onSelectView={handleViewChange}
               />
-            </Animated.View>
+            </View>
           }
         />
       ) : (
