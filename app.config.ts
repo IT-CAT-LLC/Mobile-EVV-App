@@ -22,7 +22,7 @@ const getName = () => {
     return "EVV Tracking (Prev)";
   }
 
-  return "React Conf";
+  return "Caregiver App";
 };
 
 const getAppId = () => {
