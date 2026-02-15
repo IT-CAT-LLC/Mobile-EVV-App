@@ -40,7 +40,7 @@ const getAppId = () => {
 const config: ExpoConfig = {
   name: getName(),
   slug: "evv-tracking-app",
-  version: "1.1.5",
+  version: "1.1.6",
   orientation: "portrait",
   icon: "./assets/app-icons/icon-default.png",
   userInterfaceStyle: "automatic",
