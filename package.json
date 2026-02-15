@@ -1,6 +1,6 @@
 {
   "name": "react-conf-app",
-  "version": "1.1.3",
+  "version": "1.1.5",
   "main": "expo-router/entry",
   "private": true,
   "scripts": {
@@ -11,7 +11,10 @@
     "test": "jest",
     "sync-api": "node ./scripts/syncApi.js",
     "postinstall": "patch-package",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "bump": "node ./scripts/bumpVersion.js",
+    "bump:minor": "node ./scripts/bumpVersion.js minor",
+    "bump:major": "node ./scripts/bumpVersion.js major"
   },
   "dependencies": {
     "@expo/react-native-action-sheet": "^4.1.1",
