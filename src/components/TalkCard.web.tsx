@@ -1,5 +1,6 @@
 import { Link, useRouter } from "expo-router";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
+import { format, parseISO } from "date-fns";
 
 import { Bookmark } from "./Bookmark";
 import { ThemedText, ThemedView } from "./Themed";
@@ -62,7 +63,8 @@ export function TalkCard({ session, day, isBookmarked = false }: Props) {
               marginBottom={theme.space8}
               style={{ marginLeft: theme.space24 }}
             >
-              {formatSessionTime(session, shouldUseLocalTz)}
+              {formatSessionTime(session, shouldUseLocalTz)},{" "}
+              {session.startsAt ? format(parseISO(session.startsAt), "MMM d") : ""}
             </ThemedText>
           )}
           <ThemedView
@@ -100,7 +102,7 @@ export function TalkCard({ session, day, isBookmarked = false }: Props) {
                     fontWeight="medium"
                     color={theme.color.textSecondary}
                   >
-                    {day === ConferenceDay.One ? "Day 1" : "Day 2"}
+                    {session.startsAt ? format(parseISO(session.startsAt), "MMM d") : (day === ConferenceDay.One ? "Day 1" : "Day 2")}
                   </ThemedText>
                 </View>
               )}

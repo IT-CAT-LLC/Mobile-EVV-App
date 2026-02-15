@@ -1,7 +1,7 @@
 import { useScrollToTop } from "@react-navigation/native";
 import { Stack, useFocusEffect } from "expo-router";
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import { Platform, RefreshControl } from "react-native";
+import { Platform, RefreshControl, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import Animated, {
   useAnimatedScrollHandler,
@@ -10,18 +10,21 @@ import Animated, {
   interpolate,
   Extrapolation,
 } from "react-native-reanimated";
+import { format, parseISO, isSameDay, startOfDay } from "date-fns";
 
 import { ActivityCard } from "@/components/ActivityCard";
 import { NotFound } from "@/components/NotFound";
 import { TalkCard } from "@/components/TalkCard";
-import { ConferenceDay } from "@/consts";
+import { CalendarView, ConferenceDay } from "@/consts";
 import { useReactConfStore } from "@/store/reactConfStore";
-import { DayPicker } from "@/components/DayPicker";
+import { useCalendarStore } from "@/store/calendarStore";
+import { CalendarViewPicker } from "@/components/CalendarViewPicker";
+import { DateStrip } from "@/components/DateStrip";
+import { MonthCalendar } from "@/components/MonthCalendar";
 import { useThemeColor } from "@/components/Themed";
 import { theme } from "@/theme";
 import { Session } from "@/types";
 import { isLiquidGlassAvailable } from "expo-glass-effect";
-import { getInitialDay } from "@/utils/formatDate";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   CurrentlyLive,
@@ -33,15 +36,21 @@ const AnimatedFlatList = Animated.FlatList;
 const HEADER_SCROLL_OFFSET = isLiquidGlassAvailable() ? 110 : 90;
 
 export default function Schedule() {
-  const [selectedDay, setSelectedDay] = useState(getInitialDay());
   const scrollRef = useRef<FlatList>(null);
   useScrollToTop(scrollRef as any);
   const backgroundColor = useThemeColor(theme.color.background);
   const isLiquidGlass = isLiquidGlassAvailable();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [currentMonth, setCurrentMonth] = useState(() => new Date());
   const insets = useSafeAreaInsets();
   const animatedTranslateY = useSharedValue(0);
   const isScrolledDown = useSharedValue(false);
+
+  // Calendar store state
+  const selectedDate = useCalendarStore((state) => state.selectedDate);
+  const calendarView = useCalendarStore((state) => state.calendarView);
+  const setSelectedDate = useCalendarStore((state) => state.setSelectedDate);
+  const setCalendarView = useCalendarStore((state) => state.setCalendarView);
 
   const scrollHandler = useAnimatedScrollHandler((event) => {
     animatedTranslateY.value = interpolate(
@@ -65,28 +74,64 @@ export default function Schedule() {
     };
   });
 
+  const { dayOne, dayTwo } = useReactConfStore((state) => state.schedule);
+  const refreshSchedule = useReactConfStore((state) => state.refreshData);
+
+  // Combine all sessions for filtering by date
+  const allSessions = useMemo(
+    () => [...dayOne, ...dayTwo],
+    [dayOne, dayTwo],
+  );
+
+  // Calculate events per day for DateStrip and MonthCalendar
+  const eventsPerDay = useMemo(() => {
+    const counts: Record<string, number> = {};
+    allSessions.forEach((session) => {
+      if (session.startsAt) {
+        const dateKey = format(parseISO(session.startsAt), "yyyy-MM-dd");
+        counts[dateKey] = (counts[dateKey] || 0) + 1;
+      }
+    });
+    return counts;
+  }, [allSessions]);
+
+  // Filter sessions by selected date
+  const data = useMemo(() => {
+    const selectedDateObj = parseISO(selectedDate);
+    return allSessions.filter((session) => {
+      if (!session.startsAt) return false;
+      const sessionDate = startOfDay(parseISO(session.startsAt));
+      return isSameDay(sessionDate, selectedDateObj);
+    });
+  }, [allSessions, selectedDate]);
+
+  // Determine which ConferenceDay the selected date corresponds to (for TalkCard)
+  const selectedConferenceDay = useMemo(() => {
+    if (dayOne.length > 0 && dayOne[0].startsAt) {
+      const dayOneDate = format(parseISO(dayOne[0].startsAt), "yyyy-MM-dd");
+      if (selectedDate === dayOneDate) return ConferenceDay.One;
+    }
+    return ConferenceDay.Two;
+  }, [dayOne, selectedDate]);
+
   const renderItem = useCallback(
     ({ item }: { item: Session }) => {
       if (item.isServiceSession) {
         return <ActivityCard session={item} />;
       } else {
-        return <TalkCard key={item.id} session={item} day={selectedDay} />;
+        return <TalkCard key={item.id} session={item} day={selectedConferenceDay} />;
       }
     },
-    [selectedDay],
+    [selectedConferenceDay],
   );
-
-  const { dayOne, dayTwo } = useReactConfStore((state) => state.schedule);
-  const refreshSchedule = useReactConfStore((state) => state.refreshData);
-  const data = selectedDay === ConferenceDay.One ? dayOne : dayTwo;
 
   useFocusEffect(() => {
     refreshSchedule({ ttlMs: 60_000 });
   });
 
-  const handleSelectDay = useCallback(
-    (day: ConferenceDay) => {
-      setSelectedDay(day);
+  const handleSelectDate = useCallback(
+    (date: Date) => {
+      setSelectedDate(format(date, "yyyy-MM-dd"));
       if (isScrolledDown.value) {
         scrollRef.current?.scrollToOffset({
           offset: -30 - insets.top,
@@ -94,16 +139,49 @@ export default function Schedule() {
         });
       }
     },
-    [insets.top, isScrolledDown],
+    [insets.top, isScrolledDown, setSelectedDate],
+  );
+
+  const handleViewChange = useCallback(
+    (view: CalendarView) => {
+      setCalendarView(view);
+    },
+    [setCalendarView],
+  );
+
+  const handleChangeMonth = useCallback(
+    (date: Date) => {
+      setCurrentMonth(date);
+    },
+    [],
   );
 
   const renderStickyHeader = useMemo(
     () => (
       <Animated.View style={stickyHeaderStyle}>
-        <DayPicker selectedDay={selectedDay} onSelectDay={handleSelectDay} />
+        <CalendarViewPicker
+          selectedView={calendarView}
+          onSelectView={handleViewChange}
+        />
+        {calendarView === CalendarView.Day && (
+          <DateStrip
+            selectedDate={parseISO(selectedDate)}
+            onSelectDate={handleSelectDate}
+            eventsPerDay={eventsPerDay}
+          />
+        )}
+        {calendarView === CalendarView.Month && (
+          <MonthCalendar
+            selectedDate={parseISO(selectedDate)}
+            onSelectDate={handleSelectDate}
+            currentMonth={currentMonth}
+            onChangeMonth={handleChangeMonth}
+            eventsPerDay={eventsPerDay}
+          />
+        )}
       </Animated.View>
     ),
-    [handleSelectDay, selectedDay, stickyHeaderStyle],
+    [handleViewChange, handleSelectDate, handleChangeMonth, calendarView, selectedDate, currentMonth, stickyHeaderStyle, eventsPerDay],
   );
 
   if (!dayOne.length || !dayTwo.length) {
@@ -120,7 +198,12 @@ export default function Schedule() {
   };
 
   const handleScrollToSession = (currentlyLive: CurrentlyLiveSession) => {
-    setSelectedDay(currentlyLive.day);
+    // Get the date of the session from the day
+    const sessionsForDay = currentlyLive.day === ConferenceDay.One ? dayOne : dayTwo;
+    if (sessionsForDay.length > 0 && sessionsForDay[0].startsAt) {
+      const dateStr = format(parseISO(sessionsForDay[0].startsAt), "yyyy-MM-dd");
+      setSelectedDate(dateStr);
+    }
     setTimeout(() => {
       scrollRef.current?.scrollToIndex({
         index: currentlyLive.sessionIndex,

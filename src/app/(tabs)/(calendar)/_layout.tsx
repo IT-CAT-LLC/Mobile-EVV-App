@@ -1,5 +1,5 @@
 import { useThemeColor } from "@/components/Themed";
-import { TimeZoneSwitch } from "@/components/TimeZoneSwitch";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { spaceScale, theme } from "@/theme";
 import { isLiquidGlassAvailable } from "expo-glass-effect";
 import { Image } from "expo-image";
@@ -31,7 +31,7 @@ export default function Layout() {
               : tabBarBackgroundColor,
           },
           headerLeft: () => <Image source={imageSource} style={styles.image} />,
-          headerRight: () => <TimeZoneSwitch />,
+          headerRight: () => <LanguageSelector />,
         }}
       />
     </Stack>
