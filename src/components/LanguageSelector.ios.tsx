@@ -1,10 +1,10 @@
 import { StyleSheet, useColorScheme } from "react-native";
 import {
+  Button,
   ContextMenu,
   Host,
   HStack,
   Image,
-  Picker,
   Text,
 } from "@expo/ui/swift-ui";
 import { buttonStyle, frame } from "@expo/ui/swift-ui/modifiers";
@@ -15,24 +15,22 @@ import {
   useLanguageStore,
   languageLabels,
   languageOptions,
+  Language,
 } from "@/store/languageStore";
 import { theme } from "@/theme";
 import * as Haptics from "expo-haptics";
 
 const isIpad = Device.osName === "iPadOS";
-const options = languageOptions.map((lang) => languageLabels[lang]);
 
 export function LanguageSelector() {
   const language = useLanguageStore((state) => state.language);
   const setLanguage = useLanguageStore((state) => state.setLanguage);
   const isDarkMode = useColorScheme() === "dark";
 
-  const selectedIndex = languageOptions.indexOf(language);
-
-  const handleSelect = (newIndex: number) => {
-    if (selectedIndex !== newIndex) {
+  const handleSelect = (newLang: Language) => {
+    if (language !== newLang) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      setLanguage(languageOptions[newIndex]);
+      setLanguage(newLang);
     }
   };
 
@@ -44,13 +42,14 @@ export function LanguageSelector() {
         ]}
       >
         <ContextMenu.Items>
-          <Picker
-            selectedIndex={selectedIndex}
-            options={options}
-            onOptionSelected={({ nativeEvent: { index } }) =>
-              handleSelect(index)
-            }
-          />
+          {languageOptions.map((lang) => (
+            <Button
+              key={lang}
+              onPress={() => handleSelect(lang)}
+            >
+              {language === lang ? `✓ ${languageLabels[lang]}` : languageLabels[lang]}
+            </Button>
+          ))}
         </ContextMenu.Items>
         <ContextMenu.Trigger>
           <HStack

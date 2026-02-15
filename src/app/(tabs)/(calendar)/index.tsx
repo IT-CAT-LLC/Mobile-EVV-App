@@ -233,15 +233,17 @@ export default function Schedule() {
         }}
       />
       {calendarView === CalendarView.Day ? (
-        <View style={{ flex: 1, backgroundColor }}>
-          <Animated.View style={stickyHeaderStyle}>
-            <CalendarViewPicker
-              selectedView={calendarView}
-              onSelectView={handleViewChange}
-            />
-          </Animated.View>
-          <DaySchedule initialDate={parseISO(selectedDate)} />
-        </View>
+        <DaySchedule
+          initialDate={parseISO(selectedDate)}
+          ListHeaderComponent={
+            <Animated.View style={[stickyHeaderStyle, { backgroundColor }]}>
+              <CalendarViewPicker
+                selectedView={calendarView}
+                onSelectView={handleViewChange}
+              />
+            </Animated.View>
+          }
+        />
       ) : (
         <AnimatedFlatList
           ref={scrollRef}

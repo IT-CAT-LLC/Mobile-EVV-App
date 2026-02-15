@@ -27,13 +27,14 @@ type ListItem = DayItem | VisitItem;
 
 type Props = {
   initialDate?: Date;
+  ListHeaderComponent?: React.ReactElement;
 };
 
 const INITIAL_DAYS_PAST = 30;
 const INITIAL_DAYS_FUTURE = 60;
 const LOAD_MORE_DAYS = 14;
 
-export function DaySchedule({ initialDate = new Date() }: Props) {
+export function DaySchedule({ initialDate = new Date(), ListHeaderComponent }: Props) {
   const router = useRouter();
   const isDarkMode = useColorScheme() === "dark";
   const backgroundColor = useThemeColor(theme.color.background);
@@ -193,10 +194,13 @@ export function DaySchedule({ initialDate = new Date() }: Props) {
       onEndReachedThreshold={0.5}
       onScrollToIndexFailed={onScrollToIndexFailed}
       contentContainerStyle={styles.listContent}
+      contentInsetAdjustmentBehavior="automatic"
       showsVerticalScrollIndicator={false}
       initialNumToRender={20}
       maxToRenderPerBatch={10}
       windowSize={5}
+      ListHeaderComponent={ListHeaderComponent}
+      stickyHeaderIndices={ListHeaderComponent ? [0] : undefined}
       ListEmptyComponent={
         <Animated.View entering={FadeIn} exiting={FadeOut} style={styles.empty}>
           <ThemedText fontWeight="bold" fontSize={theme.fontSize20}>
