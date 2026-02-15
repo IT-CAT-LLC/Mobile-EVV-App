@@ -225,12 +225,13 @@ export default function Schedule() {
           ),
         }}
       />
-      {calendarView === CalendarView.Day ? (
+      <View style={{ flex: 1, display: calendarView === CalendarView.Day ? 'flex' : 'none' }}>
         <DaySchedule
           initialDate={parseISO(selectedDate)}
           ListHeaderComponent={renderStickyHeader}
         />
-      ) : (
+      </View>
+      <View style={{ flex: 1, display: calendarView === CalendarView.Month ? 'flex' : 'none' }}>
         <AnimatedFlatList
           ref={scrollRef}
           refreshControl={
@@ -255,7 +256,7 @@ export default function Schedule() {
           keyExtractor={(item: Session) => item.id}
           renderItem={renderItem}
         />
-      )}
+      </View>
     </>
   );
 }
