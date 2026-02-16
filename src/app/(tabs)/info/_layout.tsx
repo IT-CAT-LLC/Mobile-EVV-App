@@ -1,4 +1,6 @@
 import { ThemedText, useThemeColor } from "@/components/Themed";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { UserMenu } from "@/components/UserMenu";
 import { theme } from "@/theme";
 import { isLiquidGlassAvailable } from "expo-glass-effect";
 import { Stack } from "expo-router";
@@ -24,7 +26,8 @@ export default function Layout() {
                 Inbox
               </ThemedText>
             ) : undefined,
-
+          headerLeft: () => <LanguageSelector />,
+          headerRight: () => <UserMenu />,
           headerStyle: {
             backgroundColor: isLiquidGlassAvailable()
               ? "transparent"

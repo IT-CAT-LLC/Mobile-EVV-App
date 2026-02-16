@@ -1,4 +1,6 @@
 import { ThemedText, useThemeColor } from "@/components/Themed";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { UserMenu } from "@/components/UserMenu";
 import { theme } from "@/theme";
 import { isLiquidGlassAvailable } from "expo-glass-effect";
 import { Stack, useRouter } from "expo-router";
@@ -30,7 +32,8 @@ export default function Layout() {
                 Care Team
               </ThemedText>
             ) : undefined,
-
+          headerLeft: () => <LanguageSelector />,
+          headerRight: () => <UserMenu />,
           headerSearchBarOptions: {
             headerIconColor: tabBarTintColor,
             tintColor: tabBarTintColor,
