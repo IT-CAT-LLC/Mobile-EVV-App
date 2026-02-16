@@ -231,50 +231,48 @@ export default function Info() {
           )}
         </View>
 
-        <View style={[styles.card, { backgroundColor: cardBackground }]}>
-          {mockNotifications.map((notification, index) => (
-            <Pressable
-              key={notification.id}
-              style={[
-                styles.notificationItem,
-                index < mockNotifications.length - 1 && styles.notificationBorder,
-                !notification.read && styles.unreadNotification,
-              ]}
-            >
-              <View
-                style={[
-                  styles.notificationIcon,
-                  { backgroundColor: isDarkMode ? "#1F2937" : "#F3F4F6" },
-                ]}
+        <View style={styles.listContainer}>
+          {mockNotifications.map((notification) => {
+            const notifColor = notification.read 
+              ? (isDarkMode ? "#9CA3AF" : "#6B7280")
+              : (isDarkMode ? "#58C4DC" : "#087EA4");
+            return (
+              <Pressable
+                key={notification.id}
+                style={[styles.rowCard, { backgroundColor: cardBackground, borderColor: isDarkMode ? "#38383A" : "#E5E5EA" }]}
               >
-                <MaterialCommunityIcons
-                  name={getNotificationIcon(notification.type)}
-                  size={20}
-                  color={isDarkMode ? "#58C4DC" : "#087EA4"}
-                />
-              </View>
-              <View style={styles.notificationContent}>
-                <View style={styles.notificationHeader}>
-                  <ThemedText fontSize={theme.fontSize14} fontWeight="semiBold" numberOfLines={1}>
-                    {notification.title}
-                  </ThemedText>
-                  <ThemedText fontSize={theme.fontSize12} color={theme.color.textSecondary}>
-                    {notification.time}
-                  </ThemedText>
+                <View style={[styles.rowIconContainer, { backgroundColor: `${notifColor}15` }]}>
+                  <MaterialCommunityIcons
+                    name={getNotificationIcon(notification.type)}
+                    size={24}
+                    color={notifColor}
+                  />
                 </View>
-                <ThemedText
-                  fontSize={theme.fontSize14}
-                  color={theme.color.textSecondary}
-                  numberOfLines={2}
-                >
-                  {notification.message}
-                </ThemedText>
-              </View>
-              {!notification.read && (
-                <View style={[styles.unreadDot, { backgroundColor: isDarkMode ? "#58C4DC" : "#087EA4" }]} />
-              )}
-            </Pressable>
-          ))}
+                <View style={styles.rowContent}>
+                  <View style={styles.rowTopRow}>
+                    <ThemedText fontSize={theme.fontSize16} fontWeight="semiBold" numberOfLines={1} style={{ flex: 1 }}>
+                      {notification.title}
+                    </ThemedText>
+                    {!notification.read && (
+                      <View style={[styles.unreadDot, { backgroundColor: notifColor }]} />
+                    )}
+                  </View>
+                  <ThemedText
+                    fontSize={theme.fontSize14}
+                    color={theme.color.textSecondary}
+                    numberOfLines={2}
+                  >
+                    {notification.message}
+                  </ThemedText>
+                  <View style={styles.rowBottomRow}>
+                    <ThemedText fontSize={theme.fontSize12} color={theme.color.textSecondary}>
+                      {notification.time}
+                    </ThemedText>
+                  </View>
+                </View>
+              </Pressable>
+            );
+          })}
         </View>
       </Animated.View>
 
@@ -295,36 +293,51 @@ export default function Info() {
           </View>
         </View>
 
-        <View style={[styles.card, { backgroundColor: cardBackground }]}>
-          {mockTodos.map((todo, index) => (
-            <Pressable
-              key={todo.id}
-              style={[
-                styles.todoItem,
-                index < mockTodos.length - 1 && styles.todoBorder,
-              ]}
-            >
-              <View
-                style={[
-                  styles.priorityIndicator,
-                  { backgroundColor: getPriorityColor(todo.priority) },
-                ]}
-              />
-              <View style={styles.todoContent}>
-                <ThemedText fontSize={theme.fontSize14} fontWeight="medium">
-                  {todo.title}
-                </ThemedText>
-                <ThemedText fontSize={theme.fontSize12} color={theme.color.textSecondary}>
-                  Due: {todo.dueDate}
-                </ThemedText>
-              </View>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={isDarkMode ? "#6B7280" : "#9CA3AF"}
-              />
-            </Pressable>
-          ))}
+        <View style={styles.listContainer}>
+          {mockTodos.map((todo) => {
+            const priorityColor = getPriorityColor(todo.priority);
+            return (
+              <Pressable
+                key={todo.id}
+                style={[styles.rowCard, { backgroundColor: cardBackground, borderColor: isDarkMode ? "#38383A" : "#E5E5EA" }]}
+              >
+                <View style={[styles.rowIconContainer, { backgroundColor: `${priorityColor}15` }]}>
+                  <MaterialCommunityIcons
+                    name={todo.completed ? "check-circle" : "clipboard-text-outline"}
+                    size={24}
+                    color={priorityColor}
+                  />
+                </View>
+                <View style={styles.rowContent}>
+                  <View style={styles.rowTopRow}>
+                    <ThemedText 
+                      fontSize={theme.fontSize16} 
+                      fontWeight="semiBold" 
+                      numberOfLines={1} 
+                      style={{ flex: 1, textDecorationLine: todo.completed ? 'line-through' : 'none' }}
+                    >
+                      {todo.title}
+                    </ThemedText>
+                    <View style={[styles.priorityBadge, { backgroundColor: `${priorityColor}20` }]}>
+                      <ThemedText fontSize={theme.fontSize10} fontWeight="bold" style={{ color: priorityColor }}>
+                        {todo.priority.toUpperCase()}
+                      </ThemedText>
+                    </View>
+                  </View>
+                  <View style={styles.rowBottomRow}>
+                    <ThemedText fontSize={theme.fontSize12} color={theme.color.textSecondary}>
+                      Due: {todo.dueDate}
+                    </ThemedText>
+                    <MaterialCommunityIcons
+                      name="chevron-right"
+                      size={20}
+                      color={isDarkMode ? "#6B7280" : "#9CA3AF"}
+                    />
+                  </View>
+                </View>
+              </Pressable>
+            );
+          })}
         </View>
       </Animated.View>
 
@@ -388,36 +401,43 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: theme.space8,
   },
-  notificationBorder: {
-    borderBottomColor: "rgba(128, 128, 128, 0.2)",
-    borderBottomWidth: 1,
+  listContainer: {
+    gap: theme.space12,
+    paddingHorizontal: theme.space16,
   },
-  notificationContent: {
-    flex: 1,
-    gap: theme.space4,
+  priorityBadge: {
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
   },
-  notificationHeader: {
+  rowBottomRow: {
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-between",
+    marginTop: theme.space4,
   },
-  notificationIcon: {
+  rowCard: {
+    borderRadius: theme.borderRadius12,
+    borderWidth: 1,
+    flexDirection: "row",
+    padding: theme.space12,
+  },
+  rowContent: {
+    flex: 1,
+  },
+  rowIconContainer: {
     alignItems: "center",
     borderRadius: theme.borderRadius10,
-    height: 40,
+    height: 48,
     justifyContent: "center",
-    width: 40,
+    marginRight: theme.space12,
+    width: 48,
   },
-  notificationItem: {
+  rowTopRow: {
     alignItems: "center",
     flexDirection: "row",
-    gap: theme.space12,
-    paddingVertical: theme.space8,
-  },
-  priorityIndicator: {
-    borderRadius: 2,
-    height: "100%",
-    width: 4,
+    justifyContent: "space-between",
+    marginBottom: theme.space2,
   },
   sectionHeader: {
     alignItems: "center",
@@ -427,26 +447,10 @@ const styles = StyleSheet.create({
     marginTop: theme.space24,
     paddingHorizontal: theme.space16,
   },
-  todoBorder: {
-    borderBottomColor: "rgba(128, 128, 128, 0.2)",
-    borderBottomWidth: 1,
-  },
-  todoContent: {
-    flex: 1,
-    gap: theme.space2,
-  },
-  todoItem: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: theme.space12,
-    paddingVertical: theme.space12,
-  },
   unreadDot: {
     borderRadius: 4,
     height: 8,
+    marginLeft: theme.space8,
     width: 8,
-  },
-  unreadNotification: {
-    backgroundColor: "rgba(8, 126, 164, 0.05)",
   },
 });
