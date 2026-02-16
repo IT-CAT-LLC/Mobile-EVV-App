@@ -1,7 +1,7 @@
 import { useScrollToTop } from "@react-navigation/native";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import { Platform, RefreshControl } from "react-native";
+import { Platform, RefreshControl, StyleSheet, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import Animated, {
   useAnimatedScrollHandler,
@@ -187,13 +187,26 @@ export default function Schedule() {
   };
 
   return (
-    <>
-      {calendarView === CalendarView.Day ? (
+    <View style={styles.container}>
+      <View 
+        style={[
+          styles.absoluteFill, 
+          { opacity: calendarView === CalendarView.Day ? 1 : 0 },
+        ]}
+        pointerEvents={calendarView === CalendarView.Day ? "auto" : "none"}
+      >
         <DaySchedule
           initialDate={parseISO(selectedDate)}
           ListHeaderComponent={renderStickyHeader}
         />
-      ) : (
+      </View>
+      <View 
+        style={[
+          styles.absoluteFill, 
+          { opacity: calendarView === CalendarView.Month ? 1 : 0 },
+        ]}
+        pointerEvents={calendarView === CalendarView.Month ? "auto" : "none"}
+      >
         <AnimatedFlatList
           ref={scrollRef}
           refreshControl={
@@ -218,7 +231,16 @@ export default function Schedule() {
           keyExtractor={(item: Session) => item.id}
           renderItem={renderItem}
         />
-      )}
-    </>
+      </View>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  absoluteFill: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  container: {
+    flex: 1,
+  },
+});
