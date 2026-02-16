@@ -66,8 +66,7 @@ const contactInfo = {
   agencyName: "Sunshine Home Care",
   phone: "(555) 800-1234",
   email: "support@sunshinehomecare.com",
-  emergencyPhone: "(555) 800-9999",
-  address: "123 Care Street, Suite 100\nSpringfield, IL 62701",
+  address: "123 Care Street, Suite 100, Springfield, IL 62701",
   hours: "Mon-Fri: 8:00 AM - 6:00 PM",
 };
 
@@ -150,54 +149,34 @@ export default function Info() {
                 </ThemedText>
               </View>
             </Pressable>
-
-            <Pressable style={styles.contactButton} onPress={handleEmail}>
-              <MaterialCommunityIcons
-                name="email-outline"
-                size={20}
-                color={isDarkMode ? "#60A5FA" : "#3B82F6"}
-              />
-              <View>
-                <ThemedText fontSize={theme.fontSize12} color={theme.color.textSecondary}>
-                  Email
-                </ThemedText>
-                <ThemedText fontSize={theme.fontSize14} fontWeight="medium" numberOfLines={1}>
-                  {contactInfo.email}
-                </ThemedText>
-              </View>
-            </Pressable>
           </View>
 
-          <Pressable
-            style={[styles.emergencyButton, { backgroundColor: isDarkMode ? "#7F1D1D" : "#FEE2E2" }]}
-            onPress={() => handleCall(contactInfo.emergencyPhone)}
-          >
+          <Pressable style={styles.contactButton} onPress={handleEmail}>
             <MaterialCommunityIcons
-              name="phone-alert"
+              name="email-outline"
               size={20}
-              color={isDarkMode ? "#F87171" : "#DC2626"}
+              color={isDarkMode ? "#60A5FA" : "#3B82F6"}
             />
             <View style={{ flex: 1 }}>
-              <ThemedText
-                fontSize={theme.fontSize12}
-                color={{ light: "#DC2626", dark: "#F87171" }}
-              >
-                Emergency Line
+              <ThemedText fontSize={theme.fontSize12} color={theme.color.textSecondary}>
+                Email
               </ThemedText>
-              <ThemedText
-                fontSize={theme.fontSize16}
-                fontWeight="semiBold"
-                color={{ light: "#DC2626", dark: "#F87171" }}
-              >
-                {contactInfo.emergencyPhone}
+              <ThemedText fontSize={theme.fontSize14} fontWeight="medium">
+                {contactInfo.email}
               </ThemedText>
             </View>
-            <MaterialCommunityIcons
-              name="chevron-right"
-              size={24}
-              color={isDarkMode ? "#F87171" : "#DC2626"}
-            />
           </Pressable>
+
+          <View style={styles.infoRow}>
+            <MaterialCommunityIcons
+              name="map-marker-outline"
+              size={18}
+              color={isDarkMode ? "#9CA3AF" : "#6B7280"}
+            />
+            <ThemedText fontSize={theme.fontSize14} color={theme.color.textSecondary} style={{ flex: 1 }}>
+              {contactInfo.address}
+            </ThemedText>
+          </View>
 
           <View style={styles.infoRow}>
             <MaterialCommunityIcons
@@ -389,15 +368,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: theme.space16,
   },
-  emergencyButton: {
-    alignItems: "center",
-    borderRadius: theme.borderRadius10,
-    flexDirection: "row",
-    gap: theme.space12,
-    padding: theme.space12,
-  },
   infoRow: {
-    alignItems: "center",
+    alignItems: "flex-start",
     flexDirection: "row",
     gap: theme.space8,
   },
